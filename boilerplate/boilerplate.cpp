@@ -19,14 +19,17 @@
 #include "ImageBuffer.h"
 
 // Specify that we want the OpenGL core profile before including GLFW headers
-#ifndef LAB_LINUX
-	#include <glad/glad.h>
-#else
-	#define GLFW_INCLUDE_GLCOREARB
-	#define GL_GLEXT_PROTOTYPES
-#endif
+#ifdef _WIN32
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#else
+#include <glad/glad.h>
+#define GLFW_INCLUDE_GLCOREARB
+#define GL_GLEXT_PROTOTYPES
+#include <GLFW/glfw3.h>
+#endif
 
+using namespace glm;
 using namespace std;
 // --------------------------------------------------------------------------
 // OpenGL utility and support function prototypes
@@ -220,7 +223,7 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(1024, 768, "CPSC 453 OpenGL Boilerplate", 0, 0);
+	window = glfwCreateWindow(1024, 768, "CPSC 453 OpenGL Assignment 4", 0, 0);
 	if (!window) {
 		cout << "Program failed to create GLFW window, TERMINATING" << endl;
 		glfwTerminate();
