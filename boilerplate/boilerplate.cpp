@@ -17,6 +17,7 @@
 #include <iterator>
 #include <glm/glm.hpp>
 #include "ImageBuffer.h"
+#include "SceneReader.h"
 
 // Specify that we want the OpenGL core profile before including GLFW headers
 #ifdef _WIN32
@@ -223,11 +224,11 @@ void rayGeneration(ImageBuffer& image)
    // find aspect ratio
    if (image.Width() > image.Height())
    {
-      xRatio = image.Width() / image.Height();
+      xRatio = static_cast<float>(image.Width()) / static_cast<float>(image.Height());
    }
    else
    {
-      yRatio = image.Height() / image.Width();
+      yRatio = static_cast<float>(image.Height()) / static_cast<float>(image.Width());;
    }
 
    // Loop over every pixel
@@ -235,8 +236,8 @@ void rayGeneration(ImageBuffer& image)
       for (int x = 0; x < image.Width(); x++){
 
          // map x and y to screen coordinates
-         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1) * tan(fov_ / 2 * M_PI / 180) * xRatio;
-         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * tan(fov_ / 2 * M_PI / 180) * yRatio;
+         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(fov_ / 2.0f * M_PI / 180.0f)) * xRatio;
+         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(fov_ / 2.0f * M_PI / 180.0f)) * yRatio;
 
          // find point
          float z = 2.0f / (2.0f * tan(fov_ / 2.0f));
@@ -304,6 +305,9 @@ int main(int argc, char *argv[])
    image.Initialize();
 
    rayGeneration(image);
+
+   SceneReader reader;
+   reader.readScene("scenes/scene1.txt");
 
    // run an event-triggered main loop
    while (!glfwWindowShouldClose(window))
