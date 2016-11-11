@@ -1,6 +1,5 @@
 #include "SceneReader.h"
 
-#include "Light.h"
 #include "Plane.h"
 #include "Sphere.h"
 #include "Triangle.h"
@@ -46,7 +45,7 @@ void SceneReader::readScene(std::string fileName)
          if (!(iss >> x >> y >> z)) { break; } // error
 
          // create light
-         Light l(x, y, z);
+         Light* l = new Light(x, y, z);
          lights.push_back(l);
       }
       else if (line.find("sphere") != std::string::npos)
@@ -65,9 +64,16 @@ void SceneReader::readScene(std::string fileName)
          float radius;
          if (!(iss2 >> radius)) { break; } // error
 
+         // read colour
+         std::getline(infile, line);
+
+         std::istringstream iss3(line);
+         float r, g, b;
+         if (!(iss3 >> r >> g >> b)) { break; } // error
+
          // creat sphere
-         Sphere s(x, y, z, radius);
-         spheres.push_back(s);
+         Sphere* s = new Sphere(x, y, z, radius, r, g, b);
+         shapes.push_back(s);
       }
       else if (line.find("plane") != std::string::npos)
       {
@@ -85,9 +91,16 @@ void SceneReader::readScene(std::string fileName)
          float px, py, pz;
          if (!(iss2 >> px >> py >> pz)) { break; } // error
 
+         // read colour
+         std::getline(infile, line);
+
+         std::istringstream iss3(line);
+         float r, g, b;
+         if (!(iss3 >> r >> g >> b)) { break; } // error
+
          // create plane
-         Plane p(nx, ny, nz, px, py, pz);
-         planes.push_back(p);
+         Plane* p = new Plane(nx, ny, nz, px, py, pz, r, g, b);
+         shapes.push_back(p);
       }
       else if (line.find("triangle") != std::string::npos)
       {
@@ -112,9 +125,16 @@ void SceneReader::readScene(std::string fileName)
          float p3x, p3y, p3z;
          if (!(iss3 >> p3x >> p3y >> p3z)) { break; } // error
 
+         // read colour
+         std::getline(infile, line);
+
+         std::istringstream iss4(line);
+         float r, g, b;
+         if (!(iss4 >> r >> g >> b)) { break; } // error
+
          // create triangle
-         Triangle t(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z);
-         triangles.push_back(t);
+         Triangle* t = new Triangle(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z, r, g, b);
+         shapes.push_back(t);
       }
    }
 }
@@ -122,7 +142,5 @@ void SceneReader::readScene(std::string fileName)
 void SceneReader::clearVectors()
 {
    lights.clear();
-   spheres.clear();
-   planes.clear();
-   triangles.clear();
+   shapes.clear();
 }

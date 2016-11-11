@@ -213,7 +213,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
       glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-void rayGeneration(ImageBuffer& image)
+void rayGeneration(ImageBuffer& image, SceneReader& reader)
 {
    vec3 rayOrigin = vec3(0, 0, 0);
    vec3 rayDirection;
@@ -243,8 +243,15 @@ void rayGeneration(ImageBuffer& image)
          float z = 2.0f / (2.0f * tan(fov_ / 2.0f));
          rayDirection = normalize(vec3(screenX, screenY, -1.0f * z));
 
-         // test colour pixel
-         image.SetPixel(x, y, rayDirection);
+         // see if any shapes intersect
+         for each(I_Shape* shape in reader.shapes)
+         {
+            if (shape->intersects(rayOrigin, rayDirection))
+            {
+               image.SetPixel(x, y, shape->colour());
+               break;
+            }
+         }
       }
    }
 }
@@ -300,14 +307,15 @@ int main(int argc, char *argv[])
    if (!InitializeGeometry(&geometry))
       cout << "Program failed to intialize geometry!" << endl;
 
+   // Read in scene
+   SceneReader reader;
+   reader.readScene("scenes/scene1.txt");
+
    // Image Buffer Stuff
    ImageBuffer image;
    image.Initialize();
 
-   rayGeneration(image);
-
-   SceneReader reader;
-   reader.readScene("scenes/scene1.txt");
+   rayGeneration(image, reader);
 
    // run an event-triggered main loop
    while (!glfwWindowShouldClose(window))

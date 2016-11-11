@@ -1,10 +1,7 @@
 #include <string>
 #include <vector>
-
-class Light;
-class Sphere;
-class Plane;
-class Triangle;
+#include "Light.h"
+#include "I_Shape.h"
 
 class SceneReader
 {
@@ -14,10 +11,8 @@ public:
 
    void readScene(std::string fileName);
 
-   std::vector<Light> lights;
-   std::vector<Sphere> spheres;
-   std::vector<Plane> planes;
-   std::vector<Triangle> triangles;
+   std::vector<Light*> lights;
+   std::vector<I_Shape*> shapes;
 
 private:
    void clearVectors();
