@@ -15,6 +15,14 @@ Plane::~Plane()
 
 bool Plane::intersects(vec3 origin, vec3 dir)
 {
+   float t = dot(point, normal) / dot(dir, normal);
+   vec3 p = t*dir;
+
+   if (dot(p - point, normal) == 0)
+   {
+      return true;
+   }
+
    return false;
 }
 

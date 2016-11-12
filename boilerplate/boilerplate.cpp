@@ -47,7 +47,7 @@ GLuint CompileShader(GLenum shaderType, const string &source);
 GLuint LinkProgram(GLuint vertexShader, GLuint fragmentShader);
 
 // Global Variables
-float fov_ = 60.0f;
+float fov_ = 55.0f;
 
 // --------------------------------------------------------------------------
 // Functions to set up OpenGL shader programs for rendering
@@ -231,6 +231,9 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
       yRatio = static_cast<float>(image.Height()) / static_cast<float>(image.Width());;
    }
 
+   // focal length
+   float z = -1.0f * (1.0f / tan(fov_ / 2.0f));
+
    // Loop over every pixel
    for (int y = 0; y < image.Height(); y++){
       for (int x = 0; x < image.Width(); x++){
@@ -240,8 +243,7 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
          float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(fov_ / 2.0f * M_PI / 180.0f)) * yRatio;
 
          // find point
-         float z = 2.0f / (2.0f * tan(fov_ / 2.0f));
-         rayDirection = normalize(vec3(screenX, screenY, -1.0f * z));
+         rayDirection = normalize(vec3(screenX, screenY, z));
 
          // see if any shapes intersect
          for each(I_Shape* shape in reader.shapes)
