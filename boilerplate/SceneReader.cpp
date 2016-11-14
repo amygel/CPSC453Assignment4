@@ -71,8 +71,15 @@ void SceneReader::readScene(std::string fileName)
          float r, g, b;
          if (!(iss3 >> r >> g >> b)) { break; } // error
 
+         // read phong exponent
+         std::getline(infile, line);
+
+         std::istringstream iss4(line);
+         float p;
+         if (!(iss4 >> p)) { break; } // error
+
          // creat sphere
-         Sphere* s = new Sphere(x, y, z, radius, r, g, b);
+         Sphere* s = new Sphere(x, y, z, radius, r, g, b, p);
          shapes.push_back(s);
       }
       else if (line.find("plane") != std::string::npos)
@@ -98,9 +105,16 @@ void SceneReader::readScene(std::string fileName)
          float r, g, b;
          if (!(iss3 >> r >> g >> b)) { break; } // error
 
+         // read phong exponent
+         std::getline(infile, line);
+
+         std::istringstream iss4(line);
+         float p;
+         if (!(iss4 >> p)) { break; } // error
+
          // create plane
-         Plane* p = new Plane(nx, ny, nz, px, py, pz, r, g, b);
-         shapes.push_back(p);
+         Plane* pl = new Plane(nx, ny, nz, px, py, pz, r, g, b, p);
+         shapes.push_back(pl);
       }
       else if (line.find("triangle") != std::string::npos)
       {
@@ -132,8 +146,15 @@ void SceneReader::readScene(std::string fileName)
          float r, g, b;
          if (!(iss4 >> r >> g >> b)) { break; } // error
 
+         // read phong exponent
+         std::getline(infile, line);
+
+         std::istringstream iss5(line);
+         float p;
+         if (!(iss5 >> p)) { break; } // error
+
          // create triangle
-         Triangle* t = new Triangle(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z, r, g, b);
+         Triangle* t = new Triangle(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z, r, g, b, p);
          shapes.push_back(t);
       }
    }

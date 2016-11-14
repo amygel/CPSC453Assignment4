@@ -7,15 +7,19 @@ class Sphere : public I_Shape
 {
 public:
    Sphere(float x, float y, float z, float radius,
-      float r, float g, float b);
+      float r, float g, float b,
+      float phongExp);
    ~Sphere();
 
-   virtual bool intersects(vec3 origin, vec3 dir);
+   virtual bool intersects(vec3 origin, vec3 dir, float& t);
    virtual vec3 colour();
-
-   vec3 center;
-   float radius;
+   virtual vec3 normal();
+   virtual float phongExp();
 
 private:
    vec3 colour_;
+   vec3 center_;
+   float radius_;
+   vec3 intersectionPoint_;
+   float phongExp_;
 };

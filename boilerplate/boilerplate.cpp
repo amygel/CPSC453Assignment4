@@ -18,6 +18,7 @@
 #include <glm/glm.hpp>
 #include "ImageBuffer.h"
 #include "SceneReader.h"
+#include "Sphere.h"
 
 // Specify that we want the OpenGL core profile before including GLFW headers
 #ifdef _WIN32
@@ -64,7 +65,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void rayGeneration(ImageBuffer& image, SceneReader& reader)
 {
-   vec3 rayOrigin = vec3(0, 0, 0);
+   vec3 rayOrigin = vec3(0.0f);
    vec3 rayDirection;
 
    float xRatio = 1.0f;
@@ -83,26 +84,37 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
    // focal length
    float z = -1.0f * (1.0f / tan(fov_ / 2.0f));
 
+   // intersecting shape
+   float t = 10000000;
+   float minT = 10000000;
+   I_Shape* currShape = new Sphere(0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f);
+
    // Loop over every pixel
-   for (int y = 0; y < image.Height(); y++){
-      for (int x = 0; x < image.Width(); x++){
+   for (int y = 0; y < image.Height(); ++y){
+      for (int x = 0; x < image.Width(); ++x){
 
          // map x and y to screen coordinates
-         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(fov_ / 2.0f * M_PI / 180.0f)) * xRatio;
-         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(fov_ / 2.0f * M_PI / 180.0f)) * yRatio;
+         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f)) * xRatio;
+         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f)) * yRatio;
 
          // find point
-         rayDirection = normalize(vec3(screenX, screenY, z));
+         rayDirection = normalize(vec3(-1.0f * screenX, screenY, z));
 
          // see if any shapes intersect
          for each(I_Shape* shape in reader.shapes)
          {
-            if (shape->intersects(rayOrigin, rayDirection))
+            if (shape->intersects(rayOrigin, rayDirection, t))
             {
-               image.SetPixel(x, y, shape->colour());
-               break;
+               if (abs(t) < minT)
+               {
+                  minT = abs(t);
+                  currShape = shape;
+               }
             }
          }
+         minT = 10000000;
+
+         image.SetPixel(x, y, currShape->colour());
       }
    }
 }

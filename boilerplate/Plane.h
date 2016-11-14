@@ -8,15 +8,18 @@ class Plane : public I_Shape
 public:
    Plane(float nx, float ny, float nz,
       float px, float py, float pz,
-      float r, float g, float b);
+      float r, float g, float b,
+      float phongExp);
    ~Plane();
 
-   virtual bool intersects(vec3 origin, vec3 dir);
+   virtual bool intersects(vec3 origin, vec3 dir, float& t);
    virtual vec3 colour();
-
-   vec3 normal;
-   vec3 point;
+   virtual vec3 normal();
+   virtual float phongExp();
 
 private:
+   vec3 point_;
+   vec3 normal_;
    vec3 colour_;
+   float phongExp_;
 };
