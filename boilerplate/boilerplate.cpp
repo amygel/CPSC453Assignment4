@@ -112,9 +112,11 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
                }
             }
          }
-         minT = 10000000;
 
          image.SetPixel(x, y, currShape->colour());
+
+         minT = 10000000;
+         I_Shape* currShape = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
       }
    }
 }

@@ -18,12 +18,16 @@ Plane::~Plane()
 
 bool Plane::intersects(vec3 origin, vec3 dir, float& t)
 {
-   t = dot(point_, normal_) / dot(dir, normal_);
-   vec3 p = t*dir;
+   float denom = dot(normal_, dir);
 
-   if (dot(p - point_, normal_) == 0)
+   if (denom > 0)
    {
-      return true;
+      t = (-1.0 * dot(point_ - origin, normal_)) / denom;
+
+      if (t >= 0)
+      {
+         return true;
+      }
    }
 
    return false;
