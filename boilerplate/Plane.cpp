@@ -16,7 +16,7 @@ Plane::~Plane()
 {
 }
 
-bool Plane::intersects(vec3 origin, vec3 dir, float& t)
+vec3 Plane::intersects(vec3 origin, vec3 dir, float& t)
 {
    float denom = dot(normal_, dir);
 
@@ -26,11 +26,11 @@ bool Plane::intersects(vec3 origin, vec3 dir, float& t)
 
       if (t >= 0)
       {
-         return true;
+         return origin + t*dir;
       }
    }
 
-   return false;
+   return vec3(-1.0f);
 }
 
 vec3 Plane::colour()

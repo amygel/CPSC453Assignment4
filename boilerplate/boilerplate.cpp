@@ -88,6 +88,7 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
    float t = 10000000;
    float minT = 10000000;
    I_Shape* currShape = new Sphere(0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f);
+   vec3 currIntersection = vec3(-1.0f);
 
    // Loop over every pixel
    for (int y = 0; y < image.Height(); ++y){
@@ -103,20 +104,39 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
          // see if any shapes intersect
          for each(I_Shape* shape in reader.shapes)
          {
-            if (shape->intersects(rayOrigin, rayDirection, t))
+            vec3 intersection = shape->intersects(rayOrigin, rayDirection, t);
+            if (intersection != vec3(-1.0f))
             {
                if (abs(t) < minT)
                {
                   minT = abs(t);
                   currShape = shape;
+                  currIntersection = intersection;
                }
             }
          }
 
-         image.SetPixel(x, y, currShape->colour());
+         //light
+         vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
+         vec3 h = normalize(rayDirection + light);
+         vec3 colour;
+         colour[0] = (currShape->colour().r * 0.4f) +
+            (currShape->colour().r * 1.0f * max(0, dot(currShape->normal(), light))) +
+            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
+            colour[1] = (currShape->colour().g * 0.4f) +
+            (currShape->colour().g * 1.0f * max(0, dot(currShape->normal(), light))) +
+            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
+         colour[2] = (currShape->colour().b * 0.4f) +
+            (currShape->colour().b * 1.0f * max(0, dot(currShape->normal(), light))) +
+            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
 
+         // Set Pixel
+         image.SetPixel(x, y, colour);
+
+         // reset state
          minT = 10000000;
          I_Shape* currShape = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+         currIntersection = vec3(-1.0f);
       }
    }
 }

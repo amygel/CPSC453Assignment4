@@ -18,7 +18,7 @@ Triangle::~Triangle()
 {
 }
 
-bool Triangle::intersects(vec3 origin, vec3 dir, float& t)
+vec3 Triangle::intersects(vec3 origin, vec3 dir, float& t)
 {
    // total area
    mat3 A;
@@ -51,10 +51,10 @@ bool Triangle::intersects(vec3 origin, vec3 dir, float& t)
 
       t = determinant(matrix) / determinant(A);
 
-      return true;
+      return origin + t*dir;
    }
 
-   return false;
+   return vec3(-1.0f);
 }
 
 vec3 Triangle::colour()

@@ -16,7 +16,7 @@ Sphere::~Sphere()
 {
 }
 
-bool Sphere::intersects(vec3 origin, vec3 dir, float& t)
+vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
 {
    float a = dot(dir, dir);
    float b = dot(dir, origin - center_);
@@ -24,7 +24,7 @@ bool Sphere::intersects(vec3 origin, vec3 dir, float& t)
 
    if ((b*b) - a*c < 0)
    {
-      return false;
+      return vec3(-1.0f);
    }
 
    // find intersection point
@@ -41,7 +41,7 @@ bool Sphere::intersects(vec3 origin, vec3 dir, float& t)
    }
    intersectionPoint_ = t * dir;
 
-   return true;
+   return intersectionPoint_;
 }
 
 vec3 Sphere::colour()

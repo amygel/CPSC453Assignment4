@@ -12,7 +12,7 @@ public:
       float phongExp);
    ~Plane();
 
-   virtual bool intersects(vec3 origin, vec3 dir, float& t);
+   virtual vec3 intersects(vec3 origin, vec3 dir, float& t);
    virtual vec3 colour();
    virtual vec3 normal();
    virtual float phongExp();
