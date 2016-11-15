@@ -45,6 +45,7 @@ bool CheckGLErrors();
 
 // Global Variables
 float fov_ = 55.0f;
+int scene_ = 0;
 
 // --------------------------------------------------------------------------
 // GLFW callback functions
@@ -61,6 +62,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
+   else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+   {
+      scene_ = (scene_ + 1) % 2;
+   }
+   else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+   {
+      scene_ = (scene_ - 1);
+      if (scene_ == -1)
+         scene_ = 1;
+   }
 }
 
 void rayGeneration(ImageBuffer& image, SceneReader& reader)
@@ -180,20 +191,33 @@ int main(int argc, char *argv[])
    // query and print out information about our OpenGL environment
    QueryGLVersion();
 
-   // Read in scene
-   SceneReader reader;
-   reader.readScene("scenes/scene1.txt");
-
    // Image Buffer Stuff
    ImageBuffer image;
    image.Initialize();
 
-   rayGeneration(image, reader);
+   SceneReader reader;
+
+   int currScene = -1;
 
    // run an event-triggered main loop
    while (!glfwWindowShouldClose(window))
    {
-      image.Render(); // Render the image
+      if (currScene != scene_)
+      {
+         if (scene_ == 0)
+         {
+            reader.readScene("scenes/scene1.txt");
+         }
+         else
+         {
+            reader.readScene("scenes/scene2.txt");
+         }
+
+         rayGeneration(image, reader);
+
+         image.Render(); // Render the image
+      }
+
       glfwSwapBuffers(window);
       glfwPollEvents();
    }
