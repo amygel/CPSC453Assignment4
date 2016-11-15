@@ -40,7 +40,7 @@ vec3 Plane::colour()
 
 vec3 Plane::normal()
 {
-   return normal_;
+   return -1.0f * normal_;
 }
 
 float Plane::phongExp()

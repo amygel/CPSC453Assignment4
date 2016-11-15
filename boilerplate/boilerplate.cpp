@@ -74,6 +74,25 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
    }
 }
 
+vec3 shading(I_Shape* shape, vec3 intersection, vec3 dir, Light* l)
+{
+   vec3 light = normalize(l->point - intersection);
+   vec3 h = normalize(dir + light);
+
+   vec3 colour;
+   colour[0] = (shape->colour().r * 0.4f) +
+      (shape->colour().r * 1.0f * max(0, dot(shape->normal(), light))) +
+      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+   colour[1] = (shape->colour().g * 0.4f) +
+      (shape->colour().g * 1.0f * max(0, dot(shape->normal(), light))) +
+      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+   colour[2] = (shape->colour().b * 0.4f) +
+      (shape->colour().b * 1.0f * max(0, dot(shape->normal(), light))) +
+      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+
+   return colour;
+}
+
 void rayGeneration(ImageBuffer& image, SceneReader& reader)
 {
    vec3 rayOrigin = vec3(0.0f);
@@ -127,19 +146,7 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
             }
          }
 
-         //light
-         vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
-         vec3 h = normalize(rayDirection + light);
-         vec3 colour;
-         colour[0] = (currShape->colour().r * 0.4f) +
-            (currShape->colour().r * 1.0f * max(0, dot(currShape->normal(), light))) +
-            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
-            colour[1] = (currShape->colour().g * 0.4f) +
-            (currShape->colour().g * 1.0f * max(0, dot(currShape->normal(), light))) +
-            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
-         colour[2] = (currShape->colour().b * 0.4f) +
-            (currShape->colour().b * 1.0f * max(0, dot(currShape->normal(), light))) +
-            (0.3f * 1.0f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
+         vec3 colour = shading(currShape, currIntersection, rayDirection, reader.lights.at(0));
 
          // Set Pixel
          image.SetPixel(x, y, colour);
