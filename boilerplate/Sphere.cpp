@@ -6,6 +6,7 @@ Sphere::Sphere(float x, float y, float z, float radius,
    float phongExp)
    : center_(x, y, z)
    , radius_(radius)
+   , normal_(vec3(0.0f))
    , colour_(r, g, b)
    , intersectionPoint_(-1.0f, -1.0f, -1.0f)
    , phongExp_(phongExp)
@@ -39,8 +40,15 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
    {
       t = t2;
    }
+
    intersectionPoint_ = t * dir;
 
+   // If calculating light ray, update normal
+   if (origin == vec3(0.0f))
+   {
+       normal_ = normalize(intersectionPoint_ - center_);
+   }
+   
    return intersectionPoint_;
 }
 
@@ -51,7 +59,7 @@ vec3 Sphere::colour()
 
 vec3 Sphere::normal()
 {
-  return normalize(intersectionPoint_ - center_);
+   return normal_;
 }
 
 float Sphere::phongExp()

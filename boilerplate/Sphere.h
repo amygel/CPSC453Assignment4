@@ -19,6 +19,7 @@ public:
 private:
    vec3 colour_;
    vec3 center_;
+   vec3 normal_;
    float radius_;
    vec3 intersectionPoint_;
    float phongExp_;

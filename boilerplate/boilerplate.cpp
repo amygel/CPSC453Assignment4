@@ -74,21 +74,47 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
    }
 }
 
-vec3 shading(I_Shape* shape, vec3 intersection, vec3 dir, Light* l)
+bool isShadow(SceneReader& reader, vec3 point, vec3 dir)
 {
-   vec3 light = normalize(l->point - intersection);
-   vec3 h = normalize(dir + light);
+    float t;
+    vec3 shadow = normalize(reader.lights.at(0)->point - point);
 
-   vec3 colour;
-   colour[0] = (shape->colour().r * 0.4f) +
-      (shape->colour().r * 1.0f * max(0, dot(shape->normal(), light))) +
-      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
-   colour[1] = (shape->colour().g * 0.4f) +
-      (shape->colour().g * 1.0f * max(0, dot(shape->normal(), light))) +
-      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
-   colour[2] = (shape->colour().b * 0.4f) +
-      (shape->colour().b * 1.0f * max(0, dot(shape->normal(), light))) +
-      (0.3f * 1.0f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+    // see if any shapes intersect
+    for each(I_Shape* shape in reader.shapes)
+    {
+        vec3 intersection = shape->intersects(point, shadow, t);
+        if (intersection != vec3(-1.0f))
+        {
+            if (t != 0)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+vec3 shading(I_Shape* shape, vec3 intersection, vec3 dir, SceneReader& reader)
+{
+   vec3 light = normalize(reader.lights.at(0)->point - intersection);
+   vec3 colour = shape->colour() * 0.4f;
+
+   if (!isShadow(reader, intersection, light))
+   {
+       vec3 h = normalize(dir + light);
+       float specular = 0.3f * pow(max(0, dot(shape->normal(), h)), shape->phongExp());
+
+       colour[0] = colour.r +
+           (shape->colour().r * max(0, dot(shape->normal(), light))) +
+           specular;
+       colour[1] = colour.g +
+           (shape->colour().g * max(0, dot(shape->normal(), light))) +
+           specular;
+       colour[2] = colour.b +
+           (shape->colour().b * max(0, dot(shape->normal(), light))) +
+           specular;
+   }
 
    return colour;
 }
@@ -146,7 +172,7 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
             }
          }
 
-         vec3 colour = shading(currShape, currIntersection, rayDirection, reader.lights.at(0));
+         vec3 colour = shading(currShape, currIntersection, rayDirection, reader);
 
          // Set Pixel
          image.SetPixel(x, y, colour);
@@ -174,7 +200,7 @@ int main(int argc, char *argv[])
    // attempt to create a window with an OpenGL 4.1 core profile context
    GLFWwindow *window = 0;
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    window = glfwCreateWindow(512, 512, "CPSC 453 OpenGL Assignment 4", 0, 0);

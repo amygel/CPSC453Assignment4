@@ -24,7 +24,7 @@ vec3 Plane::intersects(vec3 origin, vec3 dir, float& t)
    {
       t = (-1.0 * dot(point_ - origin, normal_)) / denom;
 
-      if (t >= 0)
+      if (t > 0)
       {
          return origin + t*dir;
       }
