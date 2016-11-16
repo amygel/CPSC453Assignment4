@@ -87,7 +87,7 @@ bool isShadow(SceneReader& reader, vec3 point, vec3 dir)
         {
             if (t != 0)
             {
-                return true;
+                //return true;
             }
         }
     }
