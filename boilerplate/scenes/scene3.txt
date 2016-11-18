@@ -1,0 +1,162 @@
+# ============================================================
+# Scene One for Ray Tracing
+# CPSC 453 - Assignment #4 - Winter 2016
+#
+# Instructions for reading this file:
+#   - lines beginning with ‘#’ are comments
+#   - all objects are expressed in the camera reference frame
+#   - objects are described with the following parameters:
+#      - point light source has a single position
+#      - sphere has a centre and radius
+#      - plane has a unit normal and a point on the plane
+#      - triangle has positions of its three corners, in
+#        counter-clockwise order
+#   - all shapes have a surface colour
+#   - all shapes have a phong exponent
+#   - syntax of the object specifications are as follows:
+#
+#      light    { x y z }
+#      sphere   { x y z  radius  r g b  p  isRelfective}
+#      plane    { xn yn zn  xq yq zq  r g b  p  isRelfective}
+#      triangle { x1 y1 z1  x2 y2 z2  x3 y3 z3 r g b  p  isRelfective}
+#
+# Feel free to modify or extend this scene file to your desire
+# as you complete your ray tracing system.
+# ============================================================
+
+light {
+  0 2.5 -5.75
+}
+
+# Head
+sphere {
+  0.7 1.5 -6.69
+  0.65
+  1.0 1.0 1.0
+  10
+  0
+}
+
+# Left Eye
+sphere {
+  0.4 1.2 -4.69
+  0.08
+  0.0 0.0 0.0
+  256
+  1
+}
+
+# Right Eye
+sphere {
+  0.7 1.2 -4.69
+  0.08
+  0.0 0.0 0.0
+  256
+  1
+}
+
+# Nose
+triangle {
+  0.6 0.9 -4.69
+  0.6 1.0 -4.69
+  0.5 0.5 -2.69
+  1.0 0.5 0.0
+  10
+  0
+}
+triangle {
+  0.6 0.9 -4.69
+  0.5 1.0 -4.69
+  0.5 0.5 -2.69
+  1.0 0.5 0.0
+  10
+  0
+}
+triangle {
+  0.6 1.0 -4.69
+  0.5 1.0 -4.69
+  0.5 0.5 -2.69
+  1.0 0.5 0.0
+  10
+  0
+}
+
+# Upper Body
+sphere {
+  0.7 0.1 -6.69
+  0.85
+  1.0 1.0 1.0
+  10
+  0
+}
+
+# Lower Body
+sphere {
+  0.75 -1.7 -6.69
+  1.2
+  1.0 1.0 1.0
+  10
+  0
+}
+
+# Tree
+triangle {
+  -1.4 -1.45 -9.55
+  -1.93 1.85 -8.51
+  -0.89 -1.45 -7.98
+  0.0 0.1 0.0
+  10
+  0
+}
+triangle {
+  -0.89 -1.45 -7.98
+  -1.93 1.85 -8.51
+  -2.46 -1.45 -7.47
+  0.0 0.1 0.0
+  10
+  0
+}
+triangle {
+  -2.46 -1.45 -7.47
+  -1.93 1.85 -8.51
+  -3.07 -1.45 -9.04
+  0.0 0.1 0.0
+  10
+  0
+}
+triangle {
+  -3.07 -1.45 -9.04
+  -1.93 1.85 -8.51
+  -1.4 -1.45 -9.55
+  0.0 0.1 0.0
+  10
+  0
+}
+
+# Back wall
+plane {
+  0 0 1
+  0 0 -12
+  0.0 0.81 0.82
+  2
+  0
+}
+
+# Floor
+triangle {
+  2.75 -2.75 -5
+  5.75 -0.75 -10.5
+  -5.75 -0.75 -10.5
+  1.0 1.0 1.0
+  256
+  1
+}
+triangle {
+  -2.75 -2.75 -5
+  3.05 -2.75 -5
+  -5.75 -0.75 -10.5
+  1.0 1.0 1.0
+  256
+  1
+}
+

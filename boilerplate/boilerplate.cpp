@@ -65,13 +65,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
       glfwSetWindowShouldClose(window, GL_TRUE);
    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
    {
-      scene_ = (scene_ + 1) % 2;
+      scene_ = (scene_ + 1) % 3;
    }
    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
    {
       scene_ = (scene_ - 1);
       if (scene_ == -1)
-         scene_ = 1;
+         scene_ = 2;
    }
 }
 
@@ -215,9 +215,13 @@ int main(int argc, char *argv[])
          {
             reader.readScene("scenes/scene1.txt");
          }
-         else
+         else if (scene_ == 1)
          {
             reader.readScene("scenes/scene2.txt");
+         }
+         else
+         {
+            reader.readScene("scenes/scene3.txt");
          }
 
          rayGeneration(image, reader);
