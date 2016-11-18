@@ -4,12 +4,14 @@ Triangle::Triangle(float p1x, float p1y, float p1z,
    float p2x, float p2y, float p2z,
    float p3x, float p3y, float p3z,
    float r, float g, float b,
-   float phongExp)
+   float phongExp,
+   bool isRelfective)
    : p1_(p1x, p1y, p1z)
    , p2_(p2x, p2y, p2z)
    , p3_(p3x, p3y, p3z)
    , colour_(r, g, b)
    , phongExp_(phongExp)
+   , isRelfective_(isRelfective)
 {
    normal_ = normalize(cross(p2_ - p1_, p3_ - p1_));
 }
@@ -70,4 +72,9 @@ vec3 Triangle::normal()
 float Triangle::phongExp()
 {
    return phongExp_;
+}
+
+bool Triangle::isRelfective()
+{
+   return isRelfective_;
 }

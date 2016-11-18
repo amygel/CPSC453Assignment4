@@ -78,8 +78,15 @@ void SceneReader::readScene(std::string fileName)
          float p;
          if (!(iss4 >> p)) { break; } // error
 
+         // read if is reflective
+         std::getline(infile, line);
+
+         std::istringstream iss5(line);
+         int isReflective;
+         if (!(iss5 >> isReflective)) { cout << "e" << endl; break; } // error
+
          // creat sphere
-         Sphere* s = new Sphere(x, y, z, radius, r, g, b, p);
+         Sphere* s = new Sphere(x, y, z, radius, r, g, b, p, isReflective);
          shapes.push_back(s);
       }
       else if (line.find("plane") != std::string::npos)
@@ -112,8 +119,15 @@ void SceneReader::readScene(std::string fileName)
          float p;
          if (!(iss4 >> p)) { break; } // error
 
+         // read if is reflective
+         std::getline(infile, line);
+
+         std::istringstream iss5(line);
+         int isReflective;
+         if (!(iss5 >> isReflective)) { break; } // error
+
          // create plane
-         Plane* pl = new Plane(nx, ny, nz, px, py, pz, r, g, b, p);
+         Plane* pl = new Plane(nx, ny, nz, px, py, pz, r, g, b, p, isReflective);
          shapes.push_back(pl);
       }
       else if (line.find("triangle") != std::string::npos)
@@ -153,8 +167,15 @@ void SceneReader::readScene(std::string fileName)
          float p;
          if (!(iss5 >> p)) { break; } // error
 
+         // read if is reflective
+         std::getline(infile, line);
+
+         std::istringstream iss6(line);
+         int isReflective;
+         if (!(iss6 >> isReflective)) { break; } // error
+
          // create triangle
-         Triangle* t = new Triangle(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z, r, g, b, p);
+         Triangle* t = new Triangle(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z, r, g, b, p, isReflective);
          shapes.push_back(t);
       }
    }

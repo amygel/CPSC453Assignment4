@@ -3,11 +3,13 @@
 Plane::Plane(float nx, float ny, float nz,
    float px, float py, float pz,
    float r, float g, float b,
-   float phongExp)
+   float phongExp,
+   bool isRelfective)
    : normal_(nx, ny, nz)
    , point_(px, py, pz)
    , colour_(r, g, b)
    , phongExp_(phongExp)
+   , isRelfective_(isRelfective)
 {
    normal_ = normalize(normal_);
 }
@@ -46,4 +48,9 @@ vec3 Plane::normal()
 float Plane::phongExp()
 {
    return phongExp_;
+}
+
+bool Plane::isRelfective()
+{
+   return isRelfective_;
 }

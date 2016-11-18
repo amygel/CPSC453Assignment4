@@ -46,7 +46,7 @@ bool CheckGLErrors();
 // Global Variables
 float fov_ = 55.0f;
 int scene_ = 0;
-I_Shape* DEFAULT_SHAPE = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+I_Shape* DEFAULT_SHAPE = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, false);
 
 // --------------------------------------------------------------------------
 // GLFW callback functions
@@ -75,36 +75,57 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
    }
 }
 
-bool isShadow(SceneReader& reader, vec3 point, vec3 dir)
+vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 {
-   float t;
+   // intersecting shape
+   float t = INFINITY;
+   float s = INFINITY;
+   float minT = INFINITY;
+   I_Shape* currShape = DEFAULT_SHAPE;
+   vec3 currIntersection = vec3(-1.0f);
 
-    // see if any shapes intersect
-    for each(I_Shape* shape in reader.shapes)
-    { 
-       vec3 intersection = shape->intersects(point, dir, t);
-       if (intersection != vec3(-1.0f) && t > 0)
-        {
-           //return true;
-        }
-    }
-
-    return false;
-}
-
-vec3 shading(I_Shape* shape, vec3 intersection, vec3 view, SceneReader& reader)
-{
-   vec3 colour = shape->colour() * 0.4f;
-   vec3 light = normalize(reader.lights.at(0)->point - intersection);
-
-   if (!isShadow(reader, intersection, light))
+   // see if any shapes intersect
+   for each(I_Shape* shape in reader.shapes)
    {
-       vec3 diffuse = shape->colour() * max(0, dot(shape->normal(), light));
+      vec3 intersection = shape->intersects(origin, dir, t);
+      if (intersection != vec3(-1.0f))
+      {
+         if (abs(t) < minT)
+         {
+            minT = abs(t);
+            currShape = shape;
+            currIntersection = intersection;
+         }
+      }
+   }
 
-       vec3 h = normalize(view + light);
-       vec3 specular = vec3(0.3f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+   // Set ambient colour
+   vec3 colour = currShape->colour() * 0.4f;
 
-       colour += diffuse + specular;
+   // Find if pixel in shadow
+   vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
+   vec3 shadow = currShape->intersects(currIntersection, light, s);
+   
+   if ((shadow == vec3(-1.0f) || s < 0.1) && depth > 0)
+   {
+      // Find diffuse colour
+      vec3 diffuse = currShape->colour() * max(0, dot(currShape->normal(), light));
+   
+      // Find specular colour
+      vec3 h = normalize(dir + light);
+      float specular = 0.3f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp());
+   
+      // Find reflection vector
+      vec3 reflection = dir - (2.0f * dot(dir, currShape->normal()) * currShape->normal());
+   
+      // Get colour
+      colour += diffuse + specular;
+      
+      // Reflection
+      if (currShape->isRelfective())
+      {
+         colour += specular*shading(currIntersection, reflection, reader, depth-1);
+      }   
    }
 
    return colour;
@@ -118,12 +139,6 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
    // focal length
    float z = -1.0f * (1.0f / tan(fov_ / 2.0f));
 
-   // intersecting shape
-   float t = INFINITY;
-   float minT = INFINITY;
-   I_Shape* currShape = DEFAULT_SHAPE;
-   vec3 currIntersection = vec3(-1.0f);
-
    // Loop over every pixel
    for (int y = 0; y < image.Height(); ++y){
       for (int x = 0; x < image.Width(); ++x){
@@ -135,30 +150,11 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
          // find point
          rayDirection = normalize(vec3(-1.0f * screenX, screenY, z));
 
-         // see if any shapes intersect
-         for each(I_Shape* shape in reader.shapes)
-         {
-            vec3 intersection = shape->intersects(rayOrigin, rayDirection, t);
-            if (intersection != vec3(-1.0f))
-            {
-               if (abs(t) < minT)
-               {
-                  minT = abs(t);
-                  currShape = shape;
-                  currIntersection = intersection;
-               }
-            }
-         }
-
-         vec3 colour = shading(currShape, currIntersection, rayDirection, reader);
+         // Find pixel colour
+         vec3 colour = shading(rayOrigin, rayDirection, reader, 10);
 
          // Set Pixel
          image.SetPixel(x, y, colour);
-
-         // reset state
-         minT = INFINITY;
-         currShape = DEFAULT_SHAPE;
-         currIntersection = vec3(-1.0f);
       }
    }
 }
