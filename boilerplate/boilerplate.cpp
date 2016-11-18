@@ -46,6 +46,7 @@ bool CheckGLErrors();
 // Global Variables
 float fov_ = 55.0f;
 int scene_ = 0;
+I_Shape* DEFAULT_SHAPE = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
 // --------------------------------------------------------------------------
 // GLFW callback functions
@@ -76,44 +77,34 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 bool isShadow(SceneReader& reader, vec3 point, vec3 dir)
 {
-    float t;
-    vec3 shadow = normalize(reader.lights.at(0)->point - point);
+   float t;
 
     // see if any shapes intersect
     for each(I_Shape* shape in reader.shapes)
-    {
-        vec3 intersection = shape->intersects(point, shadow, t);
-        if (intersection != vec3(-1.0f))
+    { 
+       vec3 intersection = shape->intersects(point, dir, t);
+       if (intersection != vec3(-1.0f) && t > 0)
         {
-            if (t != 0)
-            {
-                //return true;
-            }
+           //return true;
         }
     }
 
     return false;
 }
 
-vec3 shading(I_Shape* shape, vec3 intersection, vec3 dir, SceneReader& reader)
+vec3 shading(I_Shape* shape, vec3 intersection, vec3 view, SceneReader& reader)
 {
-   vec3 light = normalize(reader.lights.at(0)->point - intersection);
    vec3 colour = shape->colour() * 0.4f;
+   vec3 light = normalize(reader.lights.at(0)->point - intersection);
 
    if (!isShadow(reader, intersection, light))
    {
-       vec3 h = normalize(dir + light);
-       float specular = 0.3f * pow(max(0, dot(shape->normal(), h)), shape->phongExp());
+       vec3 diffuse = shape->colour() * max(0, dot(shape->normal(), light));
 
-       colour[0] = colour.r +
-           (shape->colour().r * max(0, dot(shape->normal(), light))) +
-           specular;
-       colour[1] = colour.g +
-           (shape->colour().g * max(0, dot(shape->normal(), light))) +
-           specular;
-       colour[2] = colour.b +
-           (shape->colour().b * max(0, dot(shape->normal(), light))) +
-           specular;
+       vec3 h = normalize(view + light);
+       vec3 specular = vec3(0.3f * pow(max(0, dot(shape->normal(), h)), shape->phongExp()));
+
+       colour += diffuse + specular;
    }
 
    return colour;
@@ -124,26 +115,13 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
    vec3 rayOrigin = vec3(0.0f);
    vec3 rayDirection;
 
-   float xRatio = 1.0f;
-   float yRatio = 1.0f;
-
-   // find aspect ratio
-   if (image.Width() > image.Height())
-   {
-      xRatio = static_cast<float>(image.Width()) / static_cast<float>(image.Height());
-   }
-   else
-   {
-      yRatio = static_cast<float>(image.Height()) / static_cast<float>(image.Width());;
-   }
-
    // focal length
    float z = -1.0f * (1.0f / tan(fov_ / 2.0f));
 
    // intersecting shape
-   float t = 10000000;
-   float minT = 10000000;
-   I_Shape* currShape = new Sphere(0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f);
+   float t = INFINITY;
+   float minT = INFINITY;
+   I_Shape* currShape = DEFAULT_SHAPE;
    vec3 currIntersection = vec3(-1.0f);
 
    // Loop over every pixel
@@ -151,8 +129,8 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
       for (int x = 0; x < image.Width(); ++x){
 
          // map x and y to screen coordinates
-         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f)) * xRatio;
-         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f)) * yRatio;
+         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f));
+         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f));
 
          // find point
          rayDirection = normalize(vec3(-1.0f * screenX, screenY, z));
@@ -178,8 +156,8 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
          image.SetPixel(x, y, colour);
 
          // reset state
-         minT = 10000000;
-         I_Shape* currShape = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+         minT = INFINITY;
+         currShape = DEFAULT_SHAPE;
          currIntersection = vec3(-1.0f);
       }
    }
@@ -200,7 +178,7 @@ int main(int argc, char *argv[])
    // attempt to create a window with an OpenGL 4.1 core profile context
    GLFWwindow *window = 0;
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    window = glfwCreateWindow(512, 512, "CPSC 453 OpenGL Assignment 4", 0, 0);

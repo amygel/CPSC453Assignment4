@@ -20,11 +20,11 @@ vec3 Plane::intersects(vec3 origin, vec3 dir, float& t)
 {
    float denom = dot(normal_, dir);
 
-   if (denom > 0)
+   if (denom > 0.0f)
    {
       t = (-1.0 * dot(point_ - origin, normal_)) / denom;
 
-      if (t > 0)
+      if (t > 0.0f)
       {
          return origin + t*dir;
       }
