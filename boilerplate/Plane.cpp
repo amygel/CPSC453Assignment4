@@ -1,4 +1,7 @@
 #include "Plane.h"
+#include "iostream"
+
+using namespace std; 
 
 Plane::Plane(float nx, float ny, float nz,
    float px, float py, float pz,
@@ -11,7 +14,7 @@ Plane::Plane(float nx, float ny, float nz,
    , phongExp_(phongExp)
    , isRelfective_(isRelfective)
 {
-   normal_ = normalize(normal_);
+   normal_ = -1.0f * normalize(normal_);
 }
 
 Plane::~Plane()
@@ -21,10 +24,12 @@ Plane::~Plane()
 vec3 Plane::intersects(vec3 origin, vec3 dir, float& t)
 {
    float denom = dot(normal_, dir);
+   //cout << "denom " << denom << endl;
 
    if (denom > 0.0f)
    {
-      t = (-1.0 * dot(point_ - origin, normal_)) / denom;
+      t = dot(point_ - origin, normal_) / denom;
+      //cout << t << endl;
 
       if (t > 0.0f)
       {

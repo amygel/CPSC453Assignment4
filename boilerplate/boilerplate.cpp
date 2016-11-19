@@ -104,27 +104,36 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 
    // Find if pixel in shadow
    vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
-   vec3 shadow = currShape->intersects(currIntersection, light, s);
-   
-   if ((shadow == vec3(-1.0f) || s < 0.1) && depth > 0)
+   vec3 shadow = vec3(-1.0f);
+
+   for each(I_Shape* shape in reader.shapes)
+   {
+      shadow = shape->intersects(currIntersection + shape->normal(), light, s);
+      if (shadow != vec3(-1.0f) && s > 0.0f)
+      {
+         break;
+      }
+   }
+    
+   if (/*(shadow == vec3(-1.0f)) &&*/ depth > 0)
    {
       // Find diffuse colour
       vec3 diffuse = currShape->colour() * max(0, dot(currShape->normal(), light));
    
       // Find specular colour
       vec3 h = normalize(dir + light);
-      float specular = 0.3f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp());
+      vec3 specular = vec3(0.3f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp()));
    
       // Find reflection vector
       vec3 reflection = dir - (2.0f * dot(dir, currShape->normal()) * currShape->normal());
    
       // Get colour
-      colour += diffuse + specular;
+      colour += diffuse;// +specular;
       
       // Reflection
       if (currShape->isRelfective())
       {
-         colour += specular*shading(currIntersection, reflection, reader, depth-1);
+         //colour += specular*shading(currIntersection, reflection, reader, depth-1);
       }   
    }
 
@@ -137,18 +146,18 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
    vec3 rayDirection;
 
    // focal length
-   float z = -1.0f * (1.0f / tan(fov_ / 2.0f));
+   float z = -1.0f * (1.0f / tan(0.5f * M_PI * fov_ / 180.0f));
 
    // Loop over every pixel
    for (int y = 0; y < image.Height(); ++y){
       for (int x = 0; x < image.Width(); ++x){
 
          // map x and y to screen coordinates
-         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f));
-         float screenY = (1.0f - 2.0f * ((y + 0.5f) / image.Height())) * static_cast<float>(tan(0.5f * M_PI * fov_ / 180.0f));
+         float screenX = (2.0f * ((x + 0.5f) / image.Width()) - 1.0f) * tan(fov_ / 2 * M_PI / 180);
+         float screenY = (2.0f * ((y + 0.5f) / image.Height()) - 1.0f) * tan(fov_ / 2 * M_PI / 180);
 
          // find point
-         rayDirection = normalize(vec3(-1.0f * screenX, screenY, z));
+         rayDirection = normalize(vec3(screenX, screenY, -1.0f));
 
          // Find pixel colour
          vec3 colour = shading(rayOrigin, rayDirection, reader, 10);

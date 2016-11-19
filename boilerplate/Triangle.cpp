@@ -53,7 +53,10 @@ vec3 Triangle::intersects(vec3 origin, vec3 dir, float& t)
 
       t = determinant(matrix) / determinant(A);
 
-      return origin + t*dir;
+      if (t > 0.0f)
+      {
+         return origin + t*dir;
+      }   
    }
 
    return vec3(-1.0f);
