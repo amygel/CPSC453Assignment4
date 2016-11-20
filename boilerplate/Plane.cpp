@@ -7,12 +7,12 @@ Plane::Plane(float nx, float ny, float nz,
    float px, float py, float pz,
    float r, float g, float b,
    float phongExp,
-   bool isRelfective)
+   float reflectivity)
    : normal_(nx, ny, nz)
    , point_(px, py, pz)
    , colour_(r, g, b)
    , phongExp_(phongExp)
-   , isRelfective_(isRelfective)
+   , reflectivity_(reflectivity)
 {
    normal_ = -1.0f * normalize(normal_);
 }
@@ -24,12 +24,10 @@ Plane::~Plane()
 vec3 Plane::intersects(vec3 origin, vec3 dir, float& t)
 {
    float denom = dot(normal_, dir);
-   //cout << "denom " << denom << endl;
 
    if (denom > 0.0f)
    {
       t = dot(point_ - origin, normal_) / denom;
-      //cout << t << endl;
 
       if (t > 0.0f)
       {
@@ -55,7 +53,7 @@ float Plane::phongExp()
    return phongExp_;
 }
 
-bool Plane::isRelfective()
+float Plane::reflectivity()
 {
-   return isRelfective_;
+   return reflectivity_;
 }

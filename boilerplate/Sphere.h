@@ -9,14 +9,14 @@ public:
    Sphere(float x, float y, float z, float radius,
       float r, float g, float b,
       float phongExp,
-      bool isRelfective);
+      float reflectivity);
    ~Sphere();
 
    virtual vec3 intersects(vec3 origin, vec3 dir, float& t);
    virtual vec3 colour();
    virtual vec3 normal();
    virtual float phongExp();
-   virtual bool isRelfective();
+   virtual float reflectivity();
 
 private:
    vec3 colour_;
@@ -25,5 +25,5 @@ private:
    float radius_;
    vec3 intersectionPoint_;
    float phongExp_;
-   bool isRelfective_;
+   float reflectivity_;
 };

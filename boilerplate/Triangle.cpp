@@ -5,13 +5,13 @@ Triangle::Triangle(float p1x, float p1y, float p1z,
    float p3x, float p3y, float p3z,
    float r, float g, float b,
    float phongExp,
-   bool isRelfective)
+   float reflectivity)
    : p1_(p1x, p1y, p1z)
    , p2_(p2x, p2y, p2z)
    , p3_(p3x, p3y, p3z)
    , colour_(r, g, b)
    , phongExp_(phongExp)
-   , isRelfective_(isRelfective)
+   , reflectivity_(reflectivity)
 {
    normal_ = normalize(cross(p2_ - p1_, p3_ - p1_));
 }
@@ -77,7 +77,7 @@ float Triangle::phongExp()
    return phongExp_;
 }
 
-bool Triangle::isRelfective()
+float Triangle::reflectivity()
 {
-   return isRelfective_;
+   return reflectivity_;
 }

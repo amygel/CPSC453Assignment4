@@ -4,14 +4,14 @@
 Sphere::Sphere(float x, float y, float z, float radius,
    float r, float g, float b,
    float phongExp,
-   bool isRelfective)
+   float reflectivity)
    : center_(x, y, z)
    , radius_(radius)
    , normal_(vec3(0.0f))
    , colour_(r, g, b)
    , intersectionPoint_(-1.0f, -1.0f, -1.0f)
    , phongExp_(phongExp)
-   , isRelfective_(isRelfective)
+   , reflectivity_(reflectivity)
 {
 }
 
@@ -73,7 +73,7 @@ float Sphere::phongExp()
    return phongExp_;
 }
 
-bool Sphere::isRelfective()
+float Sphere::reflectivity()
 {
-   return isRelfective_;
+   return reflectivity_;
 }

@@ -14,5 +14,5 @@ public:
    virtual vec3 colour() = 0;
    virtual vec3 normal() = 0;
    virtual float phongExp() = 0;
-   virtual bool isRelfective() = 0;
+   virtual float reflectivity() = 0;
 };
