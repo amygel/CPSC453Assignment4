@@ -104,9 +104,19 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 
    // Find if pixel in shadow
    vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
-   vec3 shadow = currShape->intersects(currIntersection, light, s);
+   bool isInShadow = false;
+
+   for each(I_Shape* shape in reader.shapes)
+   {
+      vec3 shadow = shape->intersects(currIntersection, light, s);
+      if (shadow != vec3(-1.0f) && shape != currShape)
+      {
+         //isInShadow = true;
+         break;
+      }
+   }
    
-   if ((shadow == vec3(-1.0f) || s < 0.1) && depth > 0)
+   if (!isInShadow && depth > 0)
    {
       // Find diffuse colour
       vec3 diffuse = currShape->colour() * max(0, dot(currShape->normal(), light));
@@ -116,15 +126,16 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
       float specular = 0.3f * pow(max(0, dot(currShape->normal(), h)), currShape->phongExp());
    
       // Find reflection vector
-      vec3 reflection = dir - (2.0f * dot(dir, currShape->normal()) * currShape->normal());
+      vec3 reflection = normalize(dir - (2.0f * dot(dir, currShape->normal()) * currShape->normal()));
    
       // Get colour
-      colour += diffuse + specular;
+      colour += diffuse + vec3(specular);
       
       // Reflection
       if (currShape->isRelfective())
       {
-         colour += specular*shading(currIntersection, reflection, reader, depth-1);
+         vec3 shade = shading(currIntersection, reflection, reader, depth - 1);
+         colour = 0.7f*colour + 0.3f*shade;
       }   
    }
 
