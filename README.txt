@@ -16,3 +16,7 @@ To Setup:
 4. Enjoy :)
 
 Keyboard Controls:
+Left/ Right Arrows: Cycle through the 3 scenes
+
+Note:
+Screenshots will be taken automatically the first time you view a scene.

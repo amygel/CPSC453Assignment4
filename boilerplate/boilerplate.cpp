@@ -47,6 +47,9 @@ bool CheckGLErrors();
 float fov_ = 55.0f;
 int scene_ = 0;
 bool useShadows_ = false;
+bool scene1TakePic_ = true;
+bool scene2TakePic_ = true;
+bool scene3TakePic_ = true;
 I_Shape* DEFAULT_SHAPE = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, false);
 
 // --------------------------------------------------------------------------
@@ -79,11 +82,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 bool isInShadow(SceneReader& reader, vec3 intersection, I_Shape* currShape, vec3 light)
 {
    float t;
+   vec3 offsetPoint = intersection + currShape->normal()*0.0001f;
+   float lightDist = length(reader.lights.at(0)->point - offsetPoint);
+   float lightVec = length(light - offsetPoint);
 
    for each(I_Shape* shape in reader.shapes)
    {
-      vec3 shadow = shape->intersects(intersection + currShape->normal()*0.0001f, light, t);
-      if (shadow != vec3(-999.0f) && currShape != shape && useShadows_)
+       vec3 shadow = shape->intersects(offsetPoint, light, t);
+       float shadowDist = length(reader.lights.at(0)->point - shadow);
+       float shadowVec = length(light - shadow);
+
+      if (shadow != vec3(-999.0f) && currShape != shape && 
+          shadowDist < lightDist && useShadows_ && shadowVec < lightVec)
       {
          return true;
       }
@@ -188,7 +198,7 @@ int main(int argc, char *argv[])
    // attempt to create a window with an OpenGL 4.1 core profile context
    GLFWwindow *window = 0;
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    window = glfwCreateWindow(512, 512, "CPSC 453 OpenGL Assignment 4", 0, 0);
@@ -227,7 +237,7 @@ int main(int argc, char *argv[])
       {
          if (scene_ == 0)
          {
-            useShadows_ = false;
+            useShadows_ = true;
             reader.readScene("scenes/scene1.txt");
          }
          else if (scene_ == 1)
@@ -237,21 +247,35 @@ int main(int argc, char *argv[])
          }
          else
          {
-            useShadows_ = false;
+             useShadows_ = true;
             reader.readScene("scenes/scene3.txt");
          }
 
          rayGeneration(image, reader);
 
          image.Render(); // Render the image
+
+         // save image to file
+         if (scene1TakePic_ && scene_ == 0)
+         {
+             image.SaveToFile("scene1.png");
+             scene1TakePic_ = false;
+         }
+         else if (scene2TakePic_ && scene_ == 1)
+         {
+             image.SaveToFile("scene2.png");
+             scene2TakePic_ = false;
+         }
+         else if (scene3TakePic_ && scene_ == 2)
+         {
+             image.SaveToFile("scene3.png");
+             scene3TakePic_ = false;
+         }
       }
 
       glfwSwapBuffers(window);
       glfwPollEvents();
    }
-
-   // save image to file
-   //image.SaveToFile("AwesomeRayTrace.png");
 
    // clean up allocated resources before exit
    image.Destroy();

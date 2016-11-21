@@ -8,6 +8,7 @@
 *.suo
 *unsuccessfulbuild*
 *.ilk
+*.png
 
 # Compiled Object files
 *.slo
