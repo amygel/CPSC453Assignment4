@@ -34,11 +34,11 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
    float t1 = (-1.0f * b + sqrt((b*b) - (a*c))) / a;
    float t2 = (-1.0f * b - sqrt((b*b) - (a*c))) / a;
 
-   if (t1 > t2 && t1 > 0.0f)
+   if (t1 < t2 && t1 > 0.0f)
    {
       t = t1;
    }
-   else if (t2 > t1 && t2 > 0.0f)
+   else if (t2 < t1 && t2 > 0.0f)
    {
       t = t2;
    }

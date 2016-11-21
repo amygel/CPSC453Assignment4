@@ -79,7 +79,6 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 {
    // intersecting shape
    float t = INFINITY;
-   float s = INFINITY;
    float minT = INFINITY;
    I_Shape* currShape = DEFAULT_SHAPE;
    vec3 currIntersection = vec3(-1.0f);
@@ -108,8 +107,8 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 
    for each(I_Shape* shape in reader.shapes)
    {
-      vec3 shadow = shape->intersects(currIntersection + currShape->normal()*0.01f, light, s);
-      if (shadow != vec3(-1.0f) && s > 0.001f)
+      vec3 shadow = shape->intersects(currIntersection + currShape->normal()*0.01f, light, t);
+      if (shadow != vec3(-1.0f) && t > 0.001f)
       {
          //isInShadow = true;
          break;
