@@ -59,7 +59,7 @@ vec3 Triangle::intersects(vec3 origin, vec3 dir, float& t)
       }   
    }
 
-   return vec3(-1.0f);
+   return vec3(-999.0f);
 }
 
 vec3 Triangle::colour()

@@ -46,6 +46,7 @@ bool CheckGLErrors();
 // Global Variables
 float fov_ = 55.0f;
 int scene_ = 0;
+bool useShadows_ = false;
 I_Shape* DEFAULT_SHAPE = new Sphere(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, false);
 
 // --------------------------------------------------------------------------
@@ -75,23 +76,39 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
    }
 }
 
+bool isInShadow(SceneReader& reader, vec3 intersection, I_Shape* currShape, vec3 light)
+{
+   float t;
+
+   for each(I_Shape* shape in reader.shapes)
+   {
+      vec3 shadow = shape->intersects(intersection + currShape->normal()*0.0001f, light, t);
+      if (shadow != vec3(-999.0f) && currShape != shape && useShadows_)
+      {
+         return true;
+      }
+   }
+
+   return false;
+}
+
 vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 {
    // intersecting shape
    float t = INFINITY;
    float minT = INFINITY;
    I_Shape* currShape = DEFAULT_SHAPE;
-   vec3 currIntersection = vec3(-1.0f);
+   vec3 currIntersection = vec3(-999.0f);
 
    // see if any shapes intersect
    for each(I_Shape* shape in reader.shapes)
    {
       vec3 intersection = shape->intersects(origin, dir, t);
-      if (intersection != vec3(-1.0f))
+      if (intersection != vec3(-999.0f))
       {
-         if (abs(t) < minT)
+         if (t < minT)
          {
-            minT = abs(t);
+            minT = t;
             currShape = shape;
             currIntersection = intersection;
          }
@@ -103,19 +120,8 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 
    // Find if pixel in shadow
    vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
-   bool isInShadow = false;
-
-   for each(I_Shape* shape in reader.shapes)
-   {
-      vec3 shadow = shape->intersects(currIntersection + currShape->normal()*0.0001f, light, t);
-      if (shadow != vec3(-1.0f))
-      {
-         //isInShadow = true;
-         break;
-      }
-   }
     
-   if (!isInShadow)
+   if (!isInShadow(reader, currIntersection, currShape, light))
    {
       // Find diffuse colour
       vec3 diffuse = currShape->colour() * max(0, dot(currShape->normal(), light));
@@ -135,7 +141,7 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
 
          vec3 shade = shading(currIntersection + currShape->normal()*0.0001f, reflection, reader, depth - 1);
 
-         colour = (1.0f - currShape->reflectivity())*colour + currShape->reflectivity()*shade;
+         colour = (1.0f - currShape->reflectivity()) * colour + currShape->reflectivity() * shade;
       }
    }
 
@@ -146,9 +152,6 @@ void rayGeneration(ImageBuffer& image, SceneReader& reader)
 {
    vec3 rayOrigin = vec3(0.0f);
    vec3 rayDirection;
-
-   // focal length
-   float z = -1.0f * (1.0f / tan(0.5f * M_PI * fov_ / 180.0f));
 
    // Loop over every pixel
    for (int y = 0; y < image.Height(); ++y){
@@ -224,14 +227,17 @@ int main(int argc, char *argv[])
       {
          if (scene_ == 0)
          {
+            useShadows_ = false;
             reader.readScene("scenes/scene1.txt");
          }
          else if (scene_ == 1)
          {
+            useShadows_ = true;
             reader.readScene("scenes/scene2.txt");
          }
          else
          {
+            useShadows_ = false;
             reader.readScene("scenes/scene3.txt");
          }
 

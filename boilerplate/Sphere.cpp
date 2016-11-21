@@ -27,7 +27,7 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
 
    if ((b*b) - a*c < 0)
    {
-      return vec3(-1.0f);
+      return vec3(-999.0f);
    }
 
    // find intersection point
@@ -44,7 +44,7 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
    }
    else
    {
-      return vec3(-1.0f);
+      return vec3(-999.0f);
    }
 
    intersectionPoint_ = origin + t * dir;
