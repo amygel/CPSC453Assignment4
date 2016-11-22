@@ -88,9 +88,9 @@ bool isInShadow(SceneReader& reader, vec3 intersection, I_Shape* currShape, vec3
 
    for each(I_Shape* shape in reader.shapes)
    {
-       vec3 shadow = shape->intersects(offsetPoint, light, t);
-       float shadowDist = length(reader.lights.at(0)->point - shadow);
-       float shadowVec = length(light - shadow);
+      vec3 shadow = shape->intersects(offsetPoint, light, t);
+      float shadowDist = length(reader.lights.at(0)->point - shadow);
+      float shadowVec = length(light - shadow);
 
       if (shadow != vec3(-999.0f) && currShape != shape && 
           shadowDist < lightDist && useShadows_ && shadowVec < lightVec)
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
    // attempt to create a window with an OpenGL 4.1 core profile context
    GLFWwindow *window = 0;
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    window = glfwCreateWindow(512, 512, "CPSC 453 OpenGL Assignment 4", 0, 0);

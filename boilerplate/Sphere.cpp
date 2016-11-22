@@ -49,11 +49,7 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
 
    intersectionPoint_ = origin + t * dir;
 
-   // If calculating light ray, update normal
-   if (origin == vec3(0.0f))
-   {
-       normal_ = normalize(intersectionPoint_ - center_);
-   }
+   normal_ = normalize(intersectionPoint_ - center_);
    
    return intersectionPoint_;
 }
