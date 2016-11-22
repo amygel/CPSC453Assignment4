@@ -46,7 +46,6 @@ bool CheckGLErrors();
 // Global Variables
 float fov_ = 55.0f;
 int scene_ = 0;
-bool useShadows_ = false;
 bool scene1TakePic_ = true;
 bool scene2TakePic_ = true;
 bool scene3TakePic_ = true;
@@ -84,16 +83,12 @@ bool isInShadow(SceneReader& reader, vec3 intersection, I_Shape* currShape, vec3
    float t;
    vec3 offsetPoint = intersection + currShape->normal()*0.0001f;
    float lightDist = length(reader.lights.at(0)->point - offsetPoint);
-   float lightVec = length(light - offsetPoint);
 
    for each(I_Shape* shape in reader.shapes)
    {
-      vec3 shadow = shape->intersects(offsetPoint, light, t);
-      float shadowDist = length(reader.lights.at(0)->point - shadow);
-      float shadowVec = length(light - shadow);
+      vec3 shadow = shape->intersects(offsetPoint, light, t);\
 
-      if (shadow != vec3(-999.0f) && currShape != shape && 
-          shadowDist < lightDist && useShadows_ && shadowVec < lightVec)
+      if (shadow != vec3(-999.0f) && currShape != shape && t < lightDist)
       {
          return true;
       }
@@ -128,7 +123,7 @@ vec3 shading(vec3 origin, vec3 dir, SceneReader& reader, int depth)
    // Set ambient colour
    vec3 colour = currShape->colour() * 0.4f;
 
-   // Find if pixel in shadow
+   // Find the light direction
    vec3 light = normalize(reader.lights.at(0)->point - currIntersection);
     
    if (!isInShadow(reader, currIntersection, currShape, light))
@@ -237,17 +232,14 @@ int main(int argc, char *argv[])
       {
          if (scene_ == 0)
          {
-            useShadows_ = true;
             reader.readScene("scenes/scene1.txt");
          }
          else if (scene_ == 1)
          {
-            useShadows_ = true;
             reader.readScene("scenes/scene2.txt");
          }
          else
          {
-             useShadows_ = true;
             reader.readScene("scenes/scene3.txt");
          }
 

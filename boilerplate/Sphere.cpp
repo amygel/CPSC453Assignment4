@@ -49,6 +49,7 @@ vec3 Sphere::intersects(vec3 origin, vec3 dir, float& t)
 
    intersectionPoint_ = origin + t * dir;
 
+   // Find normal
    normal_ = normalize(intersectionPoint_ - center_);
    
    return intersectionPoint_;
